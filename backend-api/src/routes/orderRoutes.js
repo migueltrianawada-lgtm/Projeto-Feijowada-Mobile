@@ -1,0 +1,43 @@
+const express =
+require("express");
+
+const router =
+express.Router();
+
+const OrderController =
+require(
+  "../controllers/OrderController"
+);
+
+const authMiddleware =
+require(
+  "../middlewares/authMiddleware"
+);
+
+router.get(
+  "/",
+  authMiddleware,
+  OrderController.index
+);
+
+router.get(
+  "/:id",
+  authMiddleware,
+  OrderController.show
+);
+
+router.post(
+  "/",
+  authMiddleware,
+  OrderController.store
+);
+
+router.put(
+  "/:id/status",
+  authMiddleware,
+  OrderController.updateStatus
+);
+
+
+module.exports =
+router;
