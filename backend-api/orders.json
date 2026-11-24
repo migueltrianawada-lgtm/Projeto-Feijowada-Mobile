@@ -1,0 +1,42 @@
+[
+    {
+        "id": 1,
+        "usuario_id": 1,
+        "total": 45.0,
+        "status": "Concluído",
+        "pagamento": "PIX",
+        "data": "2026-11-20"
+    },
+    {
+        "id": 2,
+        "usuario_id": 2,
+        "total": 96.0,
+        "status": "Concluído",
+        "pagamento": "Cartão",
+        "data": "2026-11-21"
+    },
+    {
+        "id": 3,
+        "usuario_id": 1,
+        "total": 32.5,
+        "status": "Pendente",
+        "pagamento": "PIX",
+        "data": "2026-11-22"
+    },
+    {
+        "id": 4,
+        "usuario_id": 3,
+        "total": 135.0,
+        "status": "Concluído",
+        "pagamento": "Cartão",
+        "data": "2026-11-23"
+    },
+    {
+        "id": 5,
+        "usuario_id": 2,
+        "total": 48.0,
+        "status": "Concluído",
+        "pagamento": "Dinheiro",
+        "data": "2026-11-24"
+    }
+]
