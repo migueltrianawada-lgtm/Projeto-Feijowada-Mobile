@@ -16,13 +16,12 @@ require(
 
 router.get(
   "/",
-  authMiddleware,
   OrderController.index
 );
 
+
 router.get(
   "/:id",
-  authMiddleware,
   OrderController.show
 );
 

@@ -13,6 +13,12 @@ export function CartProvider({
   const [cart, setCart] =
     useState([]);
 
+  function clearCart() {
+
+  setCart([]);
+
+}
+
   function addProduct(
     product
   ) {
@@ -24,14 +30,17 @@ export function CartProvider({
   }
 
   return (
-    <CartContext.Provider
-      value={{
-        cart,
-        addProduct
-      }}
-    >
-      {children}
-    </CartContext.Provider>
-  );
+  <CartContext.Provider
+    value={{
+      cart,
+      addProduct,
+      clearCart
+    }}
+  >
+    {children}
+  </CartContext.Provider>
+);
+
+
 
 }

@@ -33,11 +33,12 @@ export default function HomeScreen() {
     useState<Product[]>([]);
 
   const {
-    cart,
-    addProduct
-  } = useContext(
-    CartContext
-  ) as any;
+  cart,
+  addProduct,
+  clearCart
+} = useContext(
+  CartContext
+) as any;
 
   async function finalizarPedido() {
 
@@ -63,6 +64,7 @@ export default function HomeScreen() {
       "Sucesso",
       `Pedido #${pedido.id} criado`
     );
+    clearCart();
 
   }
   catch (error) {
