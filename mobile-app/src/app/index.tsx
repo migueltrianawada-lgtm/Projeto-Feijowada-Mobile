@@ -1,44 +1,100 @@
-import { useState } from "react";
+import {
+  useEffect,
+  useState,
+  useContext
+} from "react";
+
 import {
   View,
   Text,
-  TextInput,
-  Button,
-  Alert
+  FlatList,
+  Button
 } from "react-native";
 
-import { login } from "../services/authService";
+import { getProducts } from "../services/productService";
+
+import { CartContext } from "../context/CartContext";
+
+import { Alert } from "react-native";
+
+import { createOrder }
+from "../services/orderService";
+
+type Product = {
+  id: number;
+  nome: string;
+  descricao: string;
+  preco: number;
+};
 
 export default function HomeScreen() {
 
-  const [email, setEmail] =
-    useState("");
+  const [products, setProducts] =
+    useState<Product[]>([]);
 
-  const [senha, setSenha] =
-    useState("");
+  const {
+    cart,
+    addProduct
+  } = useContext(
+    CartContext
+  ) as any;
 
-  async function entrar() {
+  async function finalizarPedido() {
+
+  try {
+
+    const total =
+  cart.reduce(
+    (
+      acc: number,
+      item: Product
+    ) =>
+      acc + item.preco,
+    0
+  );
+
+    const pedido =
+      await createOrder(
+        1,
+        total
+      );
+
+    Alert.alert(
+      "Sucesso",
+      `Pedido #${pedido.id} criado`
+    );
+
+  }
+  catch (error) {
+
+    Alert.alert(
+      "Erro",
+      "Não foi possível criar o pedido"
+    );
+
+  }
+
+}
+
+  useEffect(() => {
+
+    loadProducts();
+
+  }, []);
+
+  async function loadProducts() {
 
     try {
 
-      const dados =
-        await login(
-          email,
-          senha
-        );
+      const data =
+        await getProducts();
 
-      Alert.alert(
-        "Login realizado",
-        dados.usuario.nome
-      );
+      setProducts(data);
 
     }
-    catch {
+    catch (error) {
 
-      Alert.alert(
-        "Erro",
-        "Login inválido"
-      );
+      console.log(error);
 
     }
 
@@ -49,44 +105,68 @@ export default function HomeScreen() {
     <View
       style={{
         flex: 1,
-        justifyContent: "center",
         padding: 20
       }}
     >
 
-      <Text>
-        Email
-      </Text>
-
-      <TextInput
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
+      <Text
         style={{
-          borderWidth: 1,
-          padding: 10,
-          marginBottom: 15
-        }}
-      />
-
-      <Text>
-        Senha
-      </Text>
-
-      <TextInput
-        value={senha}
-        onChangeText={setSenha}
-        secureTextEntry
-        style={{
-          borderWidth: 1,
-          padding: 10,
+          fontSize: 24,
+          fontWeight: "bold",
           marginBottom: 20
         }}
-      />
+      >
+        Cardápio Feijowada
+      </Text>
 
-      <Button
-        title="Entrar"
-        onPress={entrar}
+      <Text>
+        Carrinho: {cart.length} item(s)
+      </Text>
+
+<Button
+  title="Finalizar Pedido"
+  onPress={finalizarPedido}
+/>
+
+
+      <FlatList
+        data={products}
+        keyExtractor={(item) =>
+          item.id.toString()
+        }
+        renderItem={({ item }) => (
+
+          <View
+            style={{
+              borderWidth: 1,
+              padding: 15,
+              marginBottom: 10,
+              borderRadius: 10
+            }}
+          >
+
+            <Text>
+              {item.nome}
+            </Text>
+
+            <Text>
+              {item.descricao}
+            </Text>
+
+            <Text>
+              R$ {item.preco}
+            </Text>
+
+            <Button
+              title="Adicionar"
+              onPress={() =>
+                addProduct(item)
+              }
+            />
+
+          </View>
+
+        )}
       />
 
     </View>

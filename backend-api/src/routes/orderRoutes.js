@@ -28,7 +28,6 @@ router.get(
 
 router.post(
   "/",
-  authMiddleware,
   OrderController.store
 );
 
