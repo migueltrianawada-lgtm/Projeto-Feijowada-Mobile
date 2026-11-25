@@ -53,6 +53,25 @@ export default function AppTabs() {
         <NativeTabs.Trigger.Label>Detalhes</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon src={require('@/assets/images/tabIcons/explore.png')} renderingMode="template" />
       </NativeTabs.Trigger>
+
+      {/* 8. Tela de Perfil */}
+      <NativeTabs.Trigger name="profile">
+        <NativeTabs.Trigger.Label>
+          Perfil
+        </NativeTabs.Trigger.Label>
+
+        <NativeTabs.Trigger.Icon
+          src={require('@/assets/images/tabIcons/explore.png')}
+          renderingMode="template"
+        />
+      </NativeTabs.Trigger>
+
+
     </NativeTabs>
+
+
+
+
+
   );
 }
