@@ -106,6 +106,9 @@ export default function OrdersScreen() {
         <FlatList
           data={orders}
           keyExtractor={(item) => item.id.toString()}
+          showsVerticalScrollIndicator={false}
+          style={styles.listArea}
+          contentContainerStyle={styles.listContainer}
           renderItem={({ item }) => (
             <View style={styles.card}>
               <View style={styles.cardHeader}>
@@ -172,7 +175,14 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  listArea: {
+    flex: 1,
+  },
+  listContainer: {
+    paddingBottom: 15, // Espaço otimizado para rolar livremente
   },
   center: {
     flex: 1,
@@ -266,7 +276,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 8,
+    marginBottom: 85, // Sobe o botão e garante margem segura acima da Tab Bar
     elevation: 2,
   },
   backButtonText: {

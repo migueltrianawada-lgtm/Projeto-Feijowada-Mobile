@@ -146,6 +146,8 @@ export default function HomeScreen() {
         <FlatList
           data={products}
           keyExtractor={(item) => item.id.toString()}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContainer}
           renderItem={({ item }) => (
             <View style={styles.card}>
               <Image 
@@ -243,7 +245,11 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  listContainer: {
+    paddingBottom: 120, // Espaço extra no final para o último produto subir acima da barra inferior
   },
   mainTitle: {
     fontSize: 20,

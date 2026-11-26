@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { CartContext } from "../context/CartContext";
 
@@ -26,6 +26,9 @@ export default function CartScreen() {
         <FlatList
           data={cart}
           keyExtractor={(_, index) => index.toString()}
+          style={styles.listArea}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContainer}
           renderItem={({ item }) => (
             <View style={styles.itemCard}>
               <View style={styles.itemInfo}>
@@ -40,7 +43,7 @@ export default function CartScreen() {
           }
         />
 
-        {/* Rodapé e Totais mais compactos para subir os botões */}
+        {/* Rodapé e Totais com margem de segurança para subir os botões acima da Tab Bar */}
         <View style={styles.footerContainer}>
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>Total do Pedido:</Text>
@@ -118,7 +121,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
   mainTitle: {
     fontSize: 20,
@@ -126,6 +130,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "#1E293B",
     textAlign: "center",
+  },
+  listArea: {
+    flex: 1,
+  },
+  listContainer: {
+    paddingBottom: 15,
   },
   itemCard: {
     backgroundColor: '#FFFFFF',
@@ -171,9 +181,10 @@ const styles = StyleSheet.create({
   footerContainer: {
     borderTopWidth: 1,
     borderColor: '#E6DCD0',
-    paddingTop: 10,
-    marginTop: 6,
-    marginBottom: 10, // Sobe os botões afastando-os do rodapé inferior do celular
+    paddingTop: 12,
+    marginTop: 8,
+    marginBottom: 85, // Sobe os botões e afasta totalmente da barra inferior de navegação
+    backgroundColor: '#F9F6F0',
   },
   totalRow: {
     flexDirection: 'row',

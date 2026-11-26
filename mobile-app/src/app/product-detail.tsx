@@ -85,7 +85,7 @@ export default function ProductDetailScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContainer}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
       {/* Header Feijowada */}
       <View style={styles.header}>
         <View style={styles.foodPatternContainer}>
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingBottom: 30,
+    paddingBottom: 160, // Espaço extra generoso para afastar totalmente da Tab Bar
   },
   header: {
     backgroundColor: "#800020",
@@ -337,6 +337,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: "center",
+    marginBottom: 35, // Margem de segurança reforçada para afastar da barra inferior
+    elevation: 2,
   },
   backButtonText: {
     color: "#FFFFFF",

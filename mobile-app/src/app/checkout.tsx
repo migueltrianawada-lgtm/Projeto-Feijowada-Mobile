@@ -11,6 +11,8 @@ import {
   Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
+import api from "../services/api";
 import { CartContext } from "../context/CartContext";
 import { createOrder } from "../services/orderService";
 
@@ -19,7 +21,7 @@ export default function CheckoutScreen() {
   const router = useRouter();
 
   const [endereco, setEndereco] = useState("Rua Augusta, 1500 - São Paulo");
-  const [pagamento, setPagamento] = useState("PIX");
+  const [pagamento, setPagamento] = useState("Mercado Pago");
   const [loading, setLoading] = useState(false);
 
   const total = cart.reduce((acc: number, item: any) => acc + Number(item.preco), 0);
@@ -39,14 +41,27 @@ export default function CheckoutScreen() {
     try {
       setLoading(true);
 
-      // Simulação da chamada de criação de preferência / pagamento (Mercado Pago API Integration)
-      // O ID do usuário logado (ex: 1) e o valor total são enviados para o backend
-      const pedido = await createOrder(1, total);
+      // 1. Chama o backend para criar a preferência de pagamento no Mercado Pago
+      const response = await api.post('/pagamento/criar-preferencia', {
+        items: cart.map((item: any) => ({
+          nome: item.nome,
+          quantidade: 1,
+          preco: Number(item.preco)
+        }))
+      });
 
-      if (pagamento === "PIX") {
+      const { init_point } = response.data;
+
+      if (init_point) {
+        // 2. Abre a página de checkout oficial do Mercado Pago (Sandbox) no navegador do dispositivo
+        await WebBrowser.openBrowserAsync(init_point);
+
+        // 3. Cria o pedido no banco SQLite do backend
+        const pedido = await createOrder(1, total);
+
         Alert.alert(
-          "PIX Gerado com Sucesso (Mercado Pago) 💠",
-          `Pedido #${pedido.id}\nValor: R$ ${total.toFixed(2)}\n\nChave Pix Copia e Cola gerada com sandbox do Mercado Pago. O pedido foi aprovado automaticamente para testes!`,
+          "Pedido Realizado! 🎉",
+          `Pedido #${pedido.id} confirmado com sucesso!\nTotal: R$ ${total.toFixed(2)}`,
           [
             {
               text: "Ver Meus Pedidos",
@@ -58,20 +73,9 @@ export default function CheckoutScreen() {
           ]
         );
       } else {
-        Alert.alert(
-          "Pedido Realizado! 🎉",
-          `Pedido #${pedido.id} confirmado com sucesso via ${pagamento}!\nTotal: R$ ${total.toFixed(2)}`,
-          [
-            {
-              text: "Ver Meus Pedidos",
-              onPress: () => {
-                clearCart();
-                router.replace("/orders");
-              },
-            },
-          ]
-        );
+        Alert.alert("Erro", "Não foi possível gerar o link de pagamento.");
       }
+
     } catch (error) {
       console.error(error);
       Alert.alert("Erro", "Não foi possível processar o pagamento via Mercado Pago. Tente novamente.");
@@ -88,6 +92,7 @@ export default function CheckoutScreen() {
       <ScrollView 
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         {/* Header FEIJOWADA unificado */}
         <View style={styles.header}>
@@ -120,36 +125,10 @@ export default function CheckoutScreen() {
             />
           </View>
 
-          {/* Forma de Pagamento */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Forma de Pagamento (Mercado Pago):</Text>
-            <View style={styles.paymentOptions}>
-              {["PIX", "Cartão", "Dinheiro"].map((tipo) => (
-                <TouchableOpacity
-                  key={tipo}
-                  style={[
-                    styles.paymentButton,
-                    pagamento === tipo && styles.paymentButtonActive,
-                  ]}
-                  onPress={() => setPagamento(tipo)}
-                >
-                  <Text
-                    style={[
-                      styles.paymentText,
-                      pagamento === tipo && styles.paymentTextActive,
-                    ]}
-                  >
-                    {tipo === "PIX" ? "💠 PIX" : tipo === "Cartão" ? "💳 Cartão" : "💵 Dinheiro"}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
           {/* Detalhe do Gateway */}
           <View style={styles.gatewayInfoBox}>
             <Text style={styles.gatewayInfoText}>
-              🔒 Ambiente seguro integrado com a API do Mercado Pago (Sandbox Mode).
+              🔒 Ambiente seguro integrado com a API do Mercado Pago (Sandbox Mode). Ao clicar no botão, o checkout oficial será aberto.
             </Text>
           </View>
 
@@ -160,7 +139,7 @@ export default function CheckoutScreen() {
             disabled={loading}
           >
             <Text style={styles.confirmButtonText}>
-              {loading ? "Processando Pagamento..." : `✨ Pagar R$ ${total.toFixed(2)} via ${pagamento}`}
+              {loading ? "Processando Pagamento..." : `✨ Pagar R$ ${total.toFixed(2)} via Mercado Pago`}
             </Text>
           </TouchableOpacity>
 
@@ -183,7 +162,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingBottom: 30,
+    paddingBottom: 120,
   },
   header: {
     backgroundColor: "#800020",
@@ -273,32 +252,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#0F172A",
   },
-  paymentOptions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 8,
-  },
-  paymentButton: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#CBD5E1",
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  paymentButtonActive: {
-    backgroundColor: "#800020",
-    borderColor: "#800020",
-  },
-  paymentText: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#334155",
-  },
-  paymentTextActive: {
-    color: "#FFFFFF",
-  },
   gatewayInfoBox: {
     backgroundColor: "#E8F8F5",
     padding: 10,
@@ -312,7 +265,7 @@ const styles = StyleSheet.create({
     color: "#145A32",
   },
   confirmButton: {
-    backgroundColor: "#27AE60",
+    backgroundColor: "#009EE3", // Azul oficial do Mercado Pago
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: 'center',
@@ -329,6 +282,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: 'center',
+    marginBottom: 15,
   },
   backButtonText: {
     color: "#FFFFFF",
